@@ -11,6 +11,7 @@ Let’s walk through a **Git example** comparing `merge` and `rebase`, showing h
 ### 1. Create a new Git repo
 
 ```bash
+rm -rf rebase-vs-merge 
 mkdir rebase-vs-merge && cd rebase-vs-merge
 git init
 ```
