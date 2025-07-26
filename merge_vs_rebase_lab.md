@@ -118,3 +118,64 @@ Expected output:
 | Safe for public?  | ✅ Yes                      | ⚠️ No (only safe on private)   |
 
 
+##  Fast-Forward Merge Example
+
+### 1. Initialize a repo:
+
+```bash
+mkdir fast-forward-demo && cd fast-forward-demo
+git init
+```
+
+### 2. Create the first commit:
+
+```bash
+echo "Start" > file.txt
+git add .
+git commit -m "A: Initial commit"
+```
+
+### 3. Create a new branch and add a commit:
+
+```bash
+git checkout -b feature
+echo "Feature work" >> file.txt
+git commit -am "B: Commit on feature branch"
+```
+
+At this point, `master` is still at A, and `feature` is ahead by one commit (B).
+
+### 4. Merge with fast-forward:
+
+```bash
+git checkout master
+git merge feature
+```
+
+Because `master` has no new commits and `feature` is ahead, Git performs a **fast-forward merge**: it moves the `master` pointer forward to `feature`.
+
+---
+
+## ✅ Git log after fast-forward:
+
+```bash
+git log --oneline --graph --all
+```
+
+Expected output:
+
+```
+* b1b2b3b (HEAD -> master, feature) B: Commit on feature branch
+* a1a2a3a A: Initial commit
+```
+
+### 📌 Notes:
+
+* No **merge commit** is created.
+* History is **linear**.
+* This is the default merge behavior if no divergence has occurred.
+
+
+
+
+
