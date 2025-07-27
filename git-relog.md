@@ -96,7 +96,7 @@ Feature B
 
 ---
 
-### ✅ Option 2: Use `git merge HEAD@{n}`
+### ✅ Option 2: Use `git merge HEAD@{n}` include n
 
 ```bash
 # While on 'main', recover each commit
