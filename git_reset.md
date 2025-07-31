@@ -202,15 +202,58 @@ Line 3
 
 ---
 
-### 🧨 STEP 5: Reset with `--hard` to HEAD\~1 (remove commit C + Line 3)
+Here’s the properly formatted Markdown version of your full **reset and clean process**, with clear explanation:
+
+---
+
+## 🧨 STEP 5: Reset to Previous Commit (`HEAD~1`)
+
+To move your repository one commit back and discard all changes in the working directory and staging area:
 
 ```bash
 git reset --hard HEAD~1
 ```
 
+> 🎯 This removes the **latest commit** and resets your files to the state of the commit before it.
+
 ---
 
-### 🔍 STEP 6: Inspect changes
+##  Clean Untracked and Ignored Files
+
+To remove **all untracked, uncommitted, and ignored files/folders**:
+
+```bash
+git clean -xfd
+```
+
+### 🧾 Options:
+
+* `-x` – Remove files ignored by `.gitignore`
+* `-f` – Force deletion
+* `-d` – Include directories
+
+---
+
+## ✅ Final Result:
+
+Your working directory will be **identical** to the commit at `HEAD~1`:
+
+* No staged changes
+* No untracked files
+* No ignored files
+* No leftover directories
+
+---
+
+### 🔍 Optional: Dry Run Before Deleting
+
+To see what will be deleted before running the clean command:
+
+```bash
+git clean -xfdn
+```
+
+> 🕵️ Use this to preview changes and avoid accidental data loss.
 
 ```bash
 git log --oneline
