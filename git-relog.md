@@ -139,6 +139,7 @@ git reset --hard HEAD~1
 ```bash
 git reflog
 # Find lost commit hash, e.g., d4e5f6a
+# can create new branh or not
 git checkout -b recovery d4e5f6a
 
 # ✅ Check file content
