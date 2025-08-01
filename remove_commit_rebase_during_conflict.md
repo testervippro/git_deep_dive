@@ -66,9 +66,7 @@ git checkout banned
 git rebase main
 ```
 
-Now you should see a conflict message. Git pauses and shows conflict markers in `file.txt`.
 
----
 
 ### ✅ Step 7: Resolve conflict by keeping only `main`’s version
 
@@ -117,4 +115,75 @@ git reflog | grep "I: Add line from banned branch"
 
 ---
 
-Let me know if you'd like this wrapped into a shell script to run all at once.
+
+## 🧪 Git Merge – Commit `I` Is Preserved Even If Discarded
+
+### ✅ Step-by-step Script
+
+```bash
+# Create and initialize a new repo
+mkdir git-merge-test && cd git-merge-test
+git init
+
+# Step 1: Initial commit on main
+echo "line 1" > file.txt
+git add file.txt
+git commit -m "Initial commit on main"
+
+# Step 2: Create 'banned' branch and add commit I
+git checkout -b banned
+echo "line from banned branch" >> file.txt
+git add file.txt
+git commit -m "I: Add line from banned branch"
+
+# Step 3: Back to main and create conflicting commit
+git checkout main
+echo "conflicting line from main" >> file.txt
+git add file.txt
+git commit -m "Add conflicting line from main"
+
+# Step 4: Merge main into banned and hit conflict
+git checkout banned
+git merge main
+```
+
+At this point, Git will report a conflict in `file.txt`.
+
+---
+
+### 🛠 Step 5: Resolve Conflict by Keeping Only `main`'s Version
+
+```bash
+# Keep only main's version (simulate discarding I's change)
+cat <<EOF > file.txt
+line 1
+conflicting line from main
+EOF
+
+git add file.txt
+git commit -m "Merge main into banned and resolve conflict (keep main's version)"
+```
+
+---
+
+### 🔍 Step 6: Show Git Log and Prove Commit `I` Still Exists
+
+```bash
+git log --oneline --graph
+```
+
+Expected output:
+
+```
+* abc1234 Merge main into banned...
+|\
+| * def5678 Add conflicting line from main
+* | 789abcd I: Add line from banned branch
+|/
+* 0000000 Initial commit on main
+```
+
+✅ **Commit `I` is still there**, even though its change was discarded during conflict resolution.
+
+-
+
