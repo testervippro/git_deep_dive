@@ -21,17 +21,7 @@ Untracked files:
 
 ---
 
-### Bước 1: Bỏ file khỏi staging
-
-```bash
-git restore --staged utils/datas/admin/chat.ts
-```
-
-> File `chat.ts` sẽ không còn staged (ready to commit).
-
----
-
-### Bước 2: Khôi phục file từ commit trước
+### Bước 1: Khôi phục file từ commit trước
 
 ```bash
 git checkout HEAD -- utils/datas/admin/chat.ts
@@ -42,7 +32,7 @@ git checkout HEAD -- utils/datas/admin/chat.ts
 ---
 
 
-### Bước 3: Commit các thay đổi
+### Bước 2: Commit các thay đổi
 
 ```bash
 git commit -m "Update globalSetup and add adminApiFixture"
