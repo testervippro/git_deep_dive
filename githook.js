@@ -34,7 +34,7 @@ FOUND_CONSOLE=0
 echo "Checking for console.log in staged files..."
 for FILE in $STAGED_FILES; do
   if grep -n "console\\.log" "$FILE" > /dev/null; then
-    echo " Found console.log in $FILE"
+    echo "❌ Found console.log in $FILE"
     FOUND_CONSOLE=1
   fi
 done
@@ -44,18 +44,16 @@ if [ $FOUND_CONSOLE -eq 1 ]; then
 fi
 
 # -----------------------------------------------
-# Check ESLint (no auto-fix)
+# Check ESLint (strict, no auto-fix)
 # -----------------------------------------------
-echo "Running ESLint (check only)..."
-for FILE in $STAGED_FILES; do
-  npx eslint "$FILE"
-done
+echo "Running ESLint (strict check)..."
+npx eslint $STAGED_FILES
 if [ $? -ne 0 ]; then
-  echo " ESLint found errors. Commit aborted."
+  echo "❌ ESLint found errors. Commit aborted."
   exit 1
 fi
 
-echo " All checks passed. Commit can proceed."
+echo "✅ All checks passed. Commit can proceed."
 exit 0
 `;
 
