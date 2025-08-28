@@ -9,7 +9,6 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-// Hàm tạo hook
 function createHook() {
   const hookContent = `#!/bin/sh
 
