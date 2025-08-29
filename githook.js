@@ -49,7 +49,7 @@ fi
 FOUND_IMPORT=0
 echo "Checking for disallowed relative imports..."
 for FILE in $STAGED_FILES; do
-  if grep -nE "from ['\\"](\\.\\./){2,}.*['\\"]" "$FILE" > /dev/null; then
+  if grep -nE "from ['\"](\.{1,2}/).*['\"]" "$FILE" > /dev/null; then
     echo "❌ Found disallowed relative import in $FILE"
     FOUND_IMPORT=1
   fi
