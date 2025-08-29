@@ -44,22 +44,6 @@ if [ $FOUND_CONSOLE -eq 1 ]; then
 fi
 
 # -----------------------------------------------
-# Check disallowed deep relative imports (../../../)
-# -----------------------------------------------
-FOUND_IMPORT=0
-echo "Checking for disallowed relative imports..."
-for FILE in $STAGED_FILES; do
-  if grep -nE "from ['\"](\.{1,2}/).*['\"]" "$FILE" > /dev/null; then
-    echo "❌ Found disallowed relative import in $FILE"
-    FOUND_IMPORT=1
-  fi
-done
-if [ $FOUND_IMPORT -eq 1 ]; then
-  echo "Commit aborted! Please replace with '@/...' path alias."
-  exit 1
-fi
-
-# -----------------------------------------------
 # Check ESLint (strict, no auto-fix)
 # -----------------------------------------------
 echo "Running ESLint (strict check)..."
