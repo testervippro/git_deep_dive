@@ -1,182 +1,439 @@
+# 🧪 Git: `merge` vs `rebase`
 
+This guide demonstrates:
 
-## 🧪 Git: `merge` vs `rebase`
+* `git merge`
+* `git rebase`
+* Fast-forward merge
+* How commit history changes
+* How to read the Git graph
 
-Let’s walk through a **Git example** comparing `merge` and `rebase`, showing how each affects commit history using `git log`.
+---
 
+# 🔧 Setup
 
-
-## 🔧 Setup
-
-### 1. Create a new Git repo
+## 1. Create a new Git repository
 
 ```bash
-rm -rf rebase-vs-merge 
-mkdir rebase-vs-merge && cd rebase-vs-merge
+rm -rf rebase-vs-merge
+
+mkdir rebase-vs-merge
+cd rebase-vs-merge
+
 git init
-```
-
-### 2. Make an initial commit
-
-```bash
-echo "Init" > file.txt
-git add file.txt
-git commit -m "A: Initial commit"
-```
-
-### 3. Create a `feature` branch and commit
-
-```bash
-git checkout -b feature
-echo "Feature 1" >> file.txt
-git commit -am "B: Commit on feature branch"
-```
-
-### 4. Switch to `main` (or `master`) and make another commit
-
-```bash
-git checkout master
-echo "Main 1" >> file.txt
-git commit -am "C: Commit on master"
 ```
 
 ---
 
-## ✅ Case 1: `git merge`
+# 2. Create the initial commit
 
 ```bash
-git checkout feature
-git merge master
-```
+cat > file.txt <<EOF
+Line 1
+Line 2
+Line 3
+EOF
 
-### 🔍 View Git log
-
-```bash
-git log --oneline --graph --all --decorate
-```
-
-Expected output:
-
-```
-*   e3c1234 (HEAD -> feature) Merge branch 'master' into feature
-|\
-| * a1b2c3d (master) C: Commit on master
-* | 9f8e7d6 B: Commit on feature branch
-|/
-* 1234567 A: Initial commit
-```
-
-🟢 **Result**: A **merge commit** is created — preserving both histories.
-
----
-
-## ✅ Case 2: `git rebase`
-
-Let’s reset and try rebase.
-
-```bash
-
-git checkout master
-git branch -D feature  # delete old feature branch
-git checkout -b feature 1234567  # restart from commit A
-
-echo "Feature 1" >> file.txt
-git commit -am "B: Commit on feature branch"
-
-git checkout master
-echo "Main 1" >> file.txt
-git commit -am "C: Commit on master"
-
-git checkout feature
-git rebase master
-```
-
-### 🔍 View Git log
-
-```bash
-git log --oneline --graph --all --decorate
-```
-
-Expected output:
-
-```
-* 8a9b7c6 (feature) B: Commit on feature branch
-* a1b2c3d (master) C: Commit on master
-* 1234567 A: Initial commit
-```
-
-🟢 **Result**: A **linear history**, no merge commit.
-
-
-
-## 📊 Summary Table
-
-| Feature           | `git merge`                | `git rebase`                   |
-| ----------------- | -------------------------- | ------------------------------ |
-| History Shape     | Full, branched history     | Linear, rewritten history      |
-| Merge Commits     | ✅ Yes                      | ❌ No                           |
-| Use Case          | Shared branches            | Local, cleanup before merge    |
-| Safe for public?  | ✅ Yes                      | ⚠️ No (only safe on private)   |
-
-
-##  Fast-Forward Merge Example
-
-### 1. Initialize a repo:
-
-```bash
-mkdir fast-forward-demo && cd fast-forward-demo
-git init
-```
-
-### 2. Create the first commit:
-
-```bash
-echo "Start" > file.txt
 git add .
 git commit -m "A: Initial commit"
 ```
 
-### 3. Create a new branch and add a commit:
+Graph:
 
-```bash
-git checkout -b feature
-echo "Feature work" >> file.txt
-git commit -am "B: Commit on feature branch"
+```txt
+A
 ```
-
-At this point, `master` is still at A, and `feature` is ahead by one commit (B).
-
-### 4. Merge with fast-forward:
-
-```bash
-git checkout master
-git merge feature
-```
-
-Because `master` has no new commits and `feature` is ahead, Git performs a **fast-forward merge**: it moves the `master` pointer forward to `feature`.
 
 ---
 
-## ✅ Git log after fast-forward:
+# ✅ Case 1: `git merge`
+
+---
+
+## 3. Create a `feature` branch
 
 ```bash
-git log --oneline --graph --all
+git checkout -b feature
+```
+
+---
+
+## 4. Make a commit on `feature`
+
+```bash
+sed -i '' 's/Line 1/Feature change/' file.txt
+
+git commit -am "B: Feature updates line 1"
+```
+
+Graph:
+
+```txt
+A
+ \
+  B
+```
+
+---
+
+## 5. Switch back to `main`
+
+> New Git versions use `main` instead of `master`.
+
+```bash
+git checkout main
+```
+
+---
+
+## 6. Make another commit on `main`
+
+```bash
+sed -i '' 's/Line 3/Main change/' file.txt
+
+git commit -am "C: Main updates line 3"
+```
+
+Graph:
+
+```txt
+A --- C
+ \
+  B
+```
+
+---
+
+## 7. Merge `main` into `feature`
+
+```bash
+git checkout feature
+git merge main
+```
+
+Git creates a merge commit.
+
+---
+
+# 🔍 View Git log
+
+```bash
+git log --oneline --graph --all --decorate
 ```
 
 Expected output:
 
+```txt
+*   6a9a0ce (HEAD -> feature) Merge branch 'main' into feature
+|\
+| * 82b17a9 (main) C: Main updates line 3
+* | 3e0667c B: Feature updates line 1
+|/
+* 91de973 A: Initial commit
 ```
-* b1b2b3b (HEAD -> master, feature) B: Commit on feature branch
+
+---
+
+# 📌 How to read this graph
+
+```txt
+*   Merge commit
+|\
+| * Commit on main
+* | Commit on feature
+|/
+* Initial commit
+```
+
+Meaning:
+
+1. Start from commit `A`
+2. Branch split into:
+
+   * `feature` → commit `B`
+   * `main` → commit `C`
+3. Both histories were merged together into a new merge commit
+
+---
+
+# ✅ Result of `git merge`
+
+* Both branch histories are preserved
+* A merge commit is created
+* History becomes non-linear
+
+Graph:
+
+```txt
+A --- C -------- M
+ \              /
+  B ------------
+```
+
+---
+
+# ✅ Case 2: `git rebase`
+
+Now let’s recreate the same scenario using rebase.
+
+---
+
+## 1. Reset repository
+
+```bash
+rm -rf .git
+
+git init
+```
+
+---
+
+## 2. Recreate initial commit
+
+```bash
+cat > file.txt <<EOF
+Line 1
+Line 2
+Line 3
+EOF
+
+git add .
+git commit -m "A: Initial commit"
+```
+
+---
+
+## 3. Create `feature` branch
+
+```bash
+git checkout -b feature
+```
+
+---
+
+## 4. Commit on `feature`
+
+```bash
+sed -i '' 's/Line 1/Feature change/' file.txt
+
+git commit -am "B: Feature updates line 1"
+```
+
+---
+
+## 5. Switch back to `main`
+
+```bash
+git checkout main
+```
+
+---
+
+## 6. Commit on `main`
+
+```bash
+sed -i '' 's/Line 3/Main change/' file.txt
+
+git commit -am "C: Main updates line 3"
+```
+
+Graph before rebase:
+
+```txt
+A --- C
+ \
+  B
+```
+
+---
+
+## 7. Rebase `feature` onto `main`
+
+```bash
+git checkout feature
+git rebase main
+```
+
+Git takes commit `B` and replays it on top of `C`.
+
+---
+
+# 🔍 View Git log
+
+```bash
+git log --oneline --graph --all --decorate
+```
+
+Expected output:
+
+```txt
+* 7f8e9d1 (HEAD -> feature) B: Feature updates line 1
+* 82b17a9 (main) C: Main updates line 3
+* 91de973 A: Initial commit
+```
+
+---
+
+# ✅ Result of `git rebase`
+
+* No merge commit
+* History becomes linear
+* Commit `B` is rewritten as a new commit
+
+Graph:
+
+```txt
+A --- C --- B'
+```
+
+`B'` = replayed version of commit `B`
+
+---
+
+# 📊 Merge vs Rebase
+
+| Feature                 | `git merge`            | `git rebase`               |
+| ----------------------- | ---------------------- | -------------------------- |
+| History Shape           | Branched history       | Linear history             |
+| Merge Commit            | ✅ Yes                  | ❌ No                       |
+| Rewrites History        | ❌ No                   | ✅ Yes                      |
+| Safe on Shared Branches | ✅ Yes                  | ⚠️ Dangerous               |
+| Best Use Case           | Shared/public branches | Local cleanup before merge |
+
+---
+
+# ✅ Fast-Forward Merge Example
+
+A fast-forward merge happens when:
+
+```txt
+main has no new commits
+```
+
+and the target branch is simply behind another branch.
+
+---
+
+## 1. Create repository
+
+```bash
+mkdir fast-forward-demo
+cd fast-forward-demo
+
+git init
+```
+
+---
+
+## 2. Initial commit
+
+```bash
+echo "Start" > file.txt
+
+git add .
+git commit -m "A: Initial commit"
+```
+
+Graph:
+
+```txt
+A
+```
+
+---
+
+## 3. Create `feature` branch
+
+```bash
+git checkout -b feature
+```
+
+---
+
+## 4. Commit on `feature`
+
+```bash
+echo "Feature work" >> file.txt
+
+git commit -am "B: Commit on feature branch"
+```
+
+Graph:
+
+```txt
+A --- B
+        ^
+     feature
+```
+
+`main` is still pointing to `A`.
+
+---
+
+## 5. Merge into `main`
+
+```bash
+git checkout main
+git merge feature
+```
+
+Because `main` has no extra commits, Git simply moves the `main` pointer forward.
+
+No merge commit is needed.
+
+---
+
+# 🔍 Git log after fast-forward
+
+```bash
+git log --oneline --graph --all --decorate
+```
+
+Expected output:
+
+```txt
+* b1b2b3b (HEAD -> main, feature) B: Commit on feature branch
 * a1a2a3a A: Initial commit
 ```
 
-### 📌 Notes:
+---
 
-* No **merge commit** is created.
-* History is **linear**.
-* This is the default merge behavior if no divergence has occurred.
+# ✅ Result of Fast-Forward Merge
 
+* No merge commit
+* Linear history
+* Git only moves the branch pointer
 
+Graph:
 
+```txt
+A --- B
+```
 
+Both branches point to the same commit.
 
+---
+
+# 🧠 Key Mental Models
+
+## `merge`
+
+```txt
+Combine histories
+```
+
+---
+
+## `rebase`
+
+```txt
+Rewrite history
+```
+
+---
+
+## Fast-forward merge
+
+```txt
+Move branch pointer forward
+```
